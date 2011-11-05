@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+
+# Copyright (C) 2011 Osmo Salomaa
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+A CPU and memory usage monitor as a status icon.
+
+Requires gtk and psutil.
+"""
+
+import math
+import psutil
+import subprocess
+import time
+
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import Gtk
+
+class Monitor(Gtk.StatusIcon):
+
+    """A CPU and memory usage monitor as a status icon."""
+
+    def __init__(self):
+        """Initialize, but don't yet start updating."""
+        GObject.GObject.__init__(self)
+        self.set_from_icon_name("system-monitor-status-icon-111")
+        self.connect("activate", self.on_activate)
+        self.connect("popup-menu", self.on_popup_menu)
+        self.cpu_times_prev = psutil.cpu_times(percpu=True)
+
+    def get_cpu_usage(self):
+        """Return CPU usage for each processor as floats [0,1]."""
+        t1 = self.cpu_times_prev
+        t2 = psutil.cpu_times(percpu=True)
+        self.cpu_times_prev = t2
+        return [((t2[i].user + t2[i].system) -
+                 (t1[i].user + t1[i].system)) /
+                (sum(t2[i]) - sum(t1[i]))
+                for i in range(len(t1))]
+
+    def get_mem_usage(self):
+        """Return memory usage as a float [0,1]."""
+        return psutil.phymem_usage().percent / 100
+
+    def on_activate(self, icon):
+        """Launch gnome-system-monitor for details."""
+        try: subprocess.Popen("gnome-system-monitor")
+        except Exception: pass
+
+    def on_popup_menu(self, icon, button, time):
+        """Display a menu to allow quitting."""
+        # XXX: Doesn't work. Why?
+        menu = Gtk.Menu()
+        item = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_QUIT, None)
+        item.connect("activate", Gtk.main_quit)
+        menu.append(item)
+        menu.show_all()
+        menu.popup(None, None, None, None, button, time)
+
+    def update(self):
+        """Poll the usage values and update icon."""
+        cpu = self.get_cpu_usage()
+        mem = self.get_mem_usage()
+        cpu_min_state = max(1, min(4, int(math.ceil(min(cpu) * 4))))
+        cpu_max_state = max(1, min(4, int(math.ceil(max(cpu) * 4))))
+        mem_state = max(0.01, min(4, int(math.ceil(mem * 4))))
+        self.set_from_icon_name("system-monitor-status-icon-%d%d%d"
+                                % (cpu_min_state, cpu_max_state, mem_state))
+
+        self.update_tooltip(cpu, mem)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+        return True # to be called again.
+
+    def update_tooltip(self, cpu, mem):
+        """Update detailed information to tooltip."""
+        markup = ""
+        for i in range(len(cpu)):
+            markup += ("<b>CPU{0:d}:</b> {1: >3.0f} %\n"
+                       .format(i + 1, cpu[i] * 100))
+
+        markup += "<b>Mem:</b>  {0: >3.0f} %".format(mem * 100)
+        markup = "<tt>{0}</tt>".format(markup)
+        # Use no-break spaces to avoid linebreaks,
+        # which seem to act funky when using tt.
+        markup = markup.replace(" ", "\u00a0")
+        self.set_tooltip_markup(markup)
+
+
+if __name__ == "__main__":
+    monitor = Monitor()
+    GLib.timeout_add_seconds(1, monitor.update)
+    Gtk.main()
