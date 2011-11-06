@@ -90,10 +90,10 @@ class Monitor(Gtk.StatusIcon):
         """Update detailed information to tooltip."""
         markup = ""
         for i in range(len(cpu)):
-            markup += ("<b>CPU{0:d}:</b> {1: >3.0f} %\n"
+            markup += ("<b>CPU{0:\u00b7>2d}:</b> {1: >3.0f} %\n"
                        .format(i + 1, cpu[i] * 100))
 
-        markup += "<b>Mem:</b>  {0: >3.0f} %".format(mem * 100)
+        markup += "<b>Mem:</b>   {0: >3.0f} %".format(mem * 100)
         markup = "<tt>{0}</tt>".format(markup)
         # Use no-break spaces to avoid linebreaks,
         # which seem to act funky when using tt.
