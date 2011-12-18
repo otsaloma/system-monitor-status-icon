@@ -1,8 +1,11 @@
 system-monitor-status-icon is a CPU and memory usage monitor implemented
 as a status icon. It's an unambitious experiment that should work in
 GNOME 3 fallback mode out of the box, in GNOME 3 proper using some
-extension that relocates the status icon and all other desktops,
-although the icon size and background color may need adjustment.
+extension that relocates the status icon and probably other desktops as
+well. Depending on the desktop, icons may require modification to size
+and colors. 16x16 seems to work with GNOME 3 fallback mode and 24x24
+(using wide margins) with GNOME 3 proper. Icons can be easily generated
+with the provided R scripts.
 
 system-monitor-status-icon requires python 3.2 or greater [1],
 psutil 0.4.0 or greater [2] and pygobject 3.0.0 or greater [3].
