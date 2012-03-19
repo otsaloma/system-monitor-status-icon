@@ -64,7 +64,8 @@ class Monitor(Gtk.StatusIcon):
 
     def on_popup_menu(self, icon, button, time):
         """Display a menu to allow quitting."""
-        # XXX: Doesn't work. Why?
+        # XXX: Gtk.Menu.popup is broken?
+        # https://bugzilla.gnome.org/show_bug.cgi?id=657385
         menu = Gtk.Menu()
         item = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_QUIT, None)
         item.connect("activate", Gtk.main_quit)
