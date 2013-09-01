@@ -1,3 +1,4 @@
+# -*- coding: utf-8-unix -*-
 library(png)
 image = readPNG("system-monitor-status-icon.png")
 blocks = as.data.frame(which(image[,,1] > 0, arr.ind=TRUE))
