@@ -1,15 +1,15 @@
 system-monitor-status-icon
 ==========================
 
-system-monitor-status-icon is a CPU and memory usage monitor implemented
-as a status icon. Depending on your desktop environment, this might or
-might not work. With GNOME 3 it seems not to work since 3.8 or so as the
-icon updating no longer works. Also depending on your desktop
-environment the icons might or might not require modifications to their
-sizes. Icons can be easily generated with the provided R scripts.
+system-monitor-status-icon is a CPU, memory and disk usage monitor
+implemented as a status icon. Depending on your desktop environment,
+this might work great or might not work at all. Also depending on your
+desktop environment, theme etc. the icons might or might not require
+modifications to their sizes and colors. Icons can be easily generated
+with the provided R script.
 
 system-monitor-status-icon requires Python 3.2 or greater [1],
-psutil 0.4.0 or greater [2] and PyGobject 3.0.0 or greater [3].
+psutil 0.4.0 or greater [2] and PyGObject 3.0.0 or greater [3].
 
  [1] http://www.python.org/
  [2] http://code.google.com/p/psutil/

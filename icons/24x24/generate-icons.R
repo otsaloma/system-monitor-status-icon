@@ -1,36 +1,35 @@
 # -*- coding: utf-8-unix -*-
 library(png)
-image = readPNG("system-monitor-status-icon.png")
-blocks = as.data.frame(which(image[,,1] > 0, arr.ind=TRUE))
-blocks$state = ifelse(blocks$row %in% 6:8, 4,
-                      ifelse(blocks$row %in% 10:12, 3,
-                             ifelse(blocks$row %in% 14:16, 2,
-                                    ifelse(blocks$row %in% 18:20, 1,
-                                           NA))))
-
-blocks$cpu = blocks$col %in% 6:11
-blocks$mem = blocks$col %in% 14:19
-states = expand.grid(cpu_min=1:4, cpu_max=1:4, mem=1:4)
+SIZE = 24
+colors = readPNG("system-monitor-status-icon.png")
+cblocks = matrix(NA, SIZE, SIZE)
+mblocks = matrix(NA, SIZE, SIZE)
+dblocks = matrix(NA, SIZE, SIZE)
+clines = readLines("blocks.cpu")
+mlines = readLines("blocks.memory")
+dlines = readLines("blocks.disk")
+for (i in 1:SIZE) {
+    for (j in 1:SIZE) {
+        cblocks[i,j] = as.integer(substr(clines[i], j, j))
+        mblocks[i,j] = as.integer(substr(mlines[i], j, j))
+        dblocks[i,j] = as.integer(substr(dlines[i], j, j))
+    }
+}
+states = expand.grid(cpu_min=1:4, cpu_max=1:4, memory=1:4, disk=1:4)
 states = subset(states, cpu_min <= cpu_max)
-ref = readPNG("system-monitor-status-icon.png")
+states$fname = sprintf("system-monitor-status-icon-%d%d%d%d.png",
+                       states$cpu_min,
+                       states$cpu_max,
+                       states$memory,
+                       states$disk)
+
 for (i in 1:nrow(states)) {
+    image = colors
     image[,,1:4] = 0
-    cpu = (blocks$cpu &
-           blocks$state >= states$cpu_min[i] &
-           blocks$state <= states$cpu_max[i])
+    m = (cblocks %in% states$cpu_min[i]:states$cpu_max[i] |
+         mblocks %in% 1:states$memory[i] |
+         dblocks %in% 1:states$disk[i])
 
-    if (any(cpu))
-        image[blocks$row[cpu],blocks$col[cpu],] =
-            ref[blocks$row[cpu],blocks$col[cpu],]
-
-    mem = (blocks$mem & blocks$state <= states$mem[i])
-    if (any(mem))
-        image[blocks$row[mem],blocks$col[mem],] =
-            ref[blocks$row[mem],blocks$col[mem],]
-
-    writePNG(image, sprintf("system-monitor-status-icon-%d%d%d.png",
-                            states$cpu_min[i],
-                            states$cpu_max[i],
-                            states$mem[i]))
-
+    image[m] = colors[m]
+    writePNG(image, states$fname[i])
 }
