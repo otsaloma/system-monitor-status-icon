@@ -89,13 +89,13 @@ class Monitor(Gtk.StatusIcon):
         item.connect("activate", Gtk.main_quit)
         menu.append(item)
         menu.show_all()
-        # XXX: This doesn't seem to work..
+        # XXX: This doesn't seem to work.
         # (system-monitor-status-icon:7665): Gdk-CRITICAL **:
         # gdk_device_get_source: assertion `GDK_IS_DEVICE (device)' failed
         menu.popup(parent_menu_shell=None,
                    parent_menu_item=None,
-                   func=None,
-                   data=None,
+                   func=self.position_menu,
+                   data=self,
                    button=button,
                    activate_time=time)
 
@@ -122,9 +122,9 @@ class Monitor(Gtk.StatusIcon):
             markup += ("<b>CPU:</b>  {: >3.0f} %\n"
                        .format(cpu[i]*100))
 
-        markup += "<b>Mem:</b>  {: >3.0f} %".format(memory*100)
+        markup += "<b>Mem:</b>  {: >3.0f} %\n".format(memory*100)
         markup += "<b>Disk:</b> {: >3.0f} %".format(disk*100)
-        markup = "<tt>{0}</tt>".format(markup)
+        markup = "<tt>{}</tt>".format(markup)
         # Use no-break spaces to avoid linebreaks,
         # which seem to act funky when using tt.
         markup = markup.replace(" ", "\u00a0")
