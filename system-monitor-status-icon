@@ -54,6 +54,12 @@ class Monitor(Gtk.StatusIcon):
         for i in range(len(t1)):
             time1 = t1[i].user + t1[i].system
             time2 = t2[i].user + t2[i].system
+            try:
+                # Not available on all platforms.
+                time1 += t1[i].nice
+                time2 += t2[i].nice
+            except Exception:
+                pass
             total = sum(t2[i]) - sum(t1[i])
             usage[i] = (time2 - time1) / total
         return usage
