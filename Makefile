@@ -1,3 +1,4 @@
+# -*- coding: us-ascii-unix -*-
 prefix = /usr/local
 
 install:
