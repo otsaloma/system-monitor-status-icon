@@ -25,6 +25,7 @@ Requires PyGObject and psutil.
 import math
 import psutil
 import subprocess
+import sys
 
 from gi.repository import GLib
 from gi.repository import GObject
@@ -62,7 +63,7 @@ class Monitor(Gtk.StatusIcon):
                 pass
             total = sum(t2[i]) - sum(t1[i])
             usage[i] = (time2 - time1) / total
-        return usage
+        return [max(0, min(1, x)) for x in usage]
 
     def get_disk_usage(self):
         """Return disk usage [0,1]."""
@@ -73,11 +74,11 @@ class Monitor(Gtk.StatusIcon):
         bytes2 = bytes2.read_bytes + bytes2.write_bytes
         usage = bytes2 - bytes1
         self.disk_max = max(self.disk_max, usage)
-        return usage/self.disk_max
+        return max(0, min(1, usage/self.disk_max))
 
     def get_memory_usage(self):
         """Return memory usage [0,1]."""
-        return psutil.phymem_usage().percent/100
+        return max(0, min(1, psutil.phymem_usage().percent/100))
 
     def get_state(self, usage):
         """Return state [1,4] from usage fraction [0,1]."""
@@ -85,8 +86,14 @@ class Monitor(Gtk.StatusIcon):
 
     def on_activate(self, icon):
         """Launch gnome-system-monitor for details."""
-        try: subprocess.Popen("gnome-system-monitor")
-        except Exception: pass
+        try:
+            if sys.platform == "win32":
+                subprocess.Popen("taskmgr")
+            else:
+                # TODO: Add KDE, XFCE etc. equivalents.
+                subprocess.Popen("gnome-system-monitor")
+        except Exception:
+            pass
 
     def on_popup_menu(self, icon, button, time):
         """Display a menu to allow quitting."""
@@ -95,9 +102,6 @@ class Monitor(Gtk.StatusIcon):
         item.connect("activate", Gtk.main_quit)
         menu.append(item)
         menu.show_all()
-        # XXX: This doesn't seem to work.
-        # (system-monitor-status-icon:7665): Gdk-CRITICAL **:
-        # gdk_device_get_source: assertion `GDK_IS_DEVICE (device)' failed
         menu.popup(parent_menu_shell=None,
                    parent_menu_item=None,
                    func=self.position_menu,
@@ -110,12 +114,13 @@ class Monitor(Gtk.StatusIcon):
         cpu = self.get_cpu_usage()
         memory = self.get_memory_usage()
         disk = self.get_disk_usage()
-        self.set_from_icon_name("system-monitor-status-icon-{:d}{:d}{:d}{:d}"
-                                .format(self.get_state(min(cpu)),
-                                        self.get_state(max(cpu)),
-                                        self.get_state(memory),
-                                        self.get_state(disk)))
+        name = ("system-monitor-status-icon-{:d}{:d}{:d}{:d}"
+                .format(self.get_state(min(cpu)),
+                        self.get_state(max(cpu)),
+                        self.get_state(memory),
+                        self.get_state(disk)))
 
+        self.set_from_icon_name(name)
         self.update_tooltip(cpu, memory, disk)
         while Gtk.events_pending():
             Gtk.main_iteration()
@@ -123,13 +128,15 @@ class Monitor(Gtk.StatusIcon):
 
     def update_tooltip(self, cpu, memory, disk):
         """Update detailed information to tooltip."""
+        # TODO: Use Gtk.Widget.set_tooltip_window
+        # to get the labels and values to line up nicely.
         markup = ""
         for i in range(len(cpu)):
-            markup += ("<b>CPU:</b>  {: >3.0f} %\n"
+            markup += ("<b>CPU:</b> {:.0f}%\n"
                        .format(cpu[i]*100))
 
-        markup += "<b>Mem:</b>  {: >3.0f} %\n".format(memory*100)
-        markup += "<b>Disk:</b> {: >3.0f} %".format(disk*100)
+        markup += "<b>Mem:</b> {:.0f}%\n".format(memory*100)
+        markup += "<b>Disk:</b> {:.0f}%".format(disk*100)
         markup = "<tt>{}</tt>".format(markup)
         # Use no-break spaces to avoid linebreaks,
         # which seem to act funky when using tt.

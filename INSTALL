@@ -1,1 +1,2 @@
-To install, edit desired prefix into Makefile and run 'make install'.
+To install, edit desired prefix and icon size used by your panel's
+notification area (or whatever) into Makefile and run 'make install'.
