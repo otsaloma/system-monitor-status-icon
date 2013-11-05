@@ -43,14 +43,8 @@ class Monitor(Gtk.StatusIcon):
         self.set_from_icon_name("system-monitor-status-icon-1111")
         self.connect("activate", self.on_activate)
         self.connect("popup-menu", self.on_popup_menu)
-        # Keep track of disk usage per disk to figure out
-        # what speed each disk is capable of.
-        self.disk_counters = psutil.disk_io_counters(perdisk=True)
-        self.disk_history = {}
-        self.disk_max = {}
-        for name in self.disk_counters:
-            self.disk_history[name] = collections.deque(maxlen=100)
-            self.disk_max[name] = 1/1000000
+        self.disk_counters = psutil.disk_io_counters()
+        self.disk_max = -1 # MB/s
 
     def get_cpu_usage(self):
         """Return per-CPU usage between [0,1]."""
@@ -58,26 +52,15 @@ class Monitor(Gtk.StatusIcon):
         return [max(0, min(1, x/100)) for x in usage]
 
     def get_disk_usage(self):
-        """Return per-disk usage between [0,1]."""
-        # XXX: psutil.disk_io_counters seems to return
-        # disk usage per partition, not per disk.
+        """Return disk usage between [0,1]."""
         count1 = self.disk_counters
-        count2 = psutil.disk_io_counters(perdisk=True)
-        count1 = {k:v for k,v in count1.items() if k in count2}
-        count2 = {k:v for k,v in count2.items() if k in count1}
+        count2 = psutil.disk_io_counters()
         self.disk_counters = count2
-        usage = [0]*len(count1)
-        for i, name in enumerate(count1):
-            bytes1 = count1[name].read_bytes + count1[name].write_bytes
-            bytes2 = count2[name].read_bytes + count2[name].write_bytes
-            diff = (bytes2 - bytes1) / 1024**2
-            self.disk_history[name].append(diff)
-            if len(self.disk_history[name]) > 5:
-                qmax = sorted(self.disk_history[name])[-6]
-                if qmax > self.disk_max[name]:
-                    self.disk_max[name] = qmax
-            usage[i] = diff/self.disk_max[name]
-        return [max(0, min(1, x)) for x in usage]
+        bytes1 = count1.read_bytes + count1.write_bytes
+        bytes2 = count2.read_bytes + count2.write_bytes
+        diff = (bytes2 - bytes1) / 1024**2
+        self.disk_max = max(self.disk_max, diff)
+        return max(0, min(1, diff/self.disk_max))
 
     def get_memory_usage(self):
         """Return memory usage between [0,1]."""
@@ -122,7 +105,7 @@ class Monitor(Gtk.StatusIcon):
                 .format(self.get_state(min(cpu)),
                         self.get_state(max(cpu)),
                         self.get_state(memory),
-                        self.get_state(max(disk))))
+                        self.get_state(disk)))
 
         self.set_from_icon_name(name)
         self.update_tooltip(cpu, memory, disk)
@@ -140,10 +123,7 @@ class Monitor(Gtk.StatusIcon):
                        .format(cpu[i]*100))
 
         markup += "<b>Mem:</b> {:.0f}%\n".format(memory*100)
-        for i in range(len(disk)):
-            markup += ("<b>Disk:</b> {:.0f}%\n"
-                       .format(disk[i]*100))
-
+        markup += "<b>Disk:</b> {:.0f}%\n".format(disk*100)
         markup = "<tt>{}</tt>".format(markup)
         # Use no-break spaces to avoid linebreaks,
         # which seem to act funky when using tt.
@@ -153,8 +133,5 @@ class Monitor(Gtk.StatusIcon):
 
 if __name__ == "__main__":
     monitor = Monitor()
-    # One second interval seems too fast for Windows;
-    # usages jump back and forth between 0 and 100 %.
-    interval = (2 if sys.platform == "win32" else 1)
-    GLib.timeout_add_seconds(interval, monitor.update)
+    GLib.timeout_add_seconds(2, monitor.update)
     Gtk.main()
