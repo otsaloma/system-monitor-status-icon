@@ -44,7 +44,7 @@ class Monitor(Gtk.StatusIcon):
         self.connect("activate", self.on_activate)
         self.connect("popup-menu", self.on_popup_menu)
         self.disk_counters = psutil.disk_io_counters()
-        self.disk_max = -1 # MB/s
+        self.disk_max = 1/1000000
 
     def get_cpu_usage(self):
         """Return per-CPU usage between [0,1]."""
