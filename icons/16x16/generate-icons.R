@@ -1,13 +1,8 @@
 # -*- coding: utf-8-unix -*-
 library(png)
-SIZE = 16
-read.blocks = function(x)
-    with(lines <- strsplit(readLines(x), split=""),
-         do.call(rbind, lapply(lines, as.integer)))
-
-cblocks = read.blocks("blocks.cpu")
-mblocks = read.blocks("blocks.memory")
-dblocks = read.blocks("blocks.disk")
+cblocks = as.matrix(read.table("blocks.cpu"))
+mblocks = as.matrix(read.table("blocks.memory"))
+dblocks = as.matrix(read.table("blocks.disk"))
 states = expand.grid(cpu_min=1:4, cpu_max=1:4, memory=1:4, disk=1:4)
 states$fname = sprintf("system-monitor-status-icon-%d%d%d%d.png",
                        states$cpu_min,
