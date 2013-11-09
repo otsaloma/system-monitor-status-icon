@@ -72,7 +72,7 @@ class Monitor(Gtk.StatusIcon):
         return max(1, min(4, int(math.ceil(usage*4))))
 
     def on_activate(self, icon):
-        """Launch gnome-system-monitor for details."""
+        """Launch a system monitor application for details."""
         try:
             if sys.platform == "win32":
                 subprocess.Popen("taskmgr")
