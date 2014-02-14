@@ -1,16 +1,14 @@
 # -*- coding: us-ascii-unix -*-
 
-prefix = /usr/local
-icon_size = 24
+DESTDIR =
+PREFIX  = /usr/local
+bindir  = $(DESTDIR)$(PREFIX)/bin
 
-icon_source = icons/$(icon_size)x$(icon_size)
-icon_target = $(prefix)/share/icons/hicolor/$(icon_size)x$(icon_size)/apps
+ICON_SIZE   = 24
+icon_source = icons/$(ICON_SIZE)x$(ICON_SIZE)
+icon_target = $(DESTDIR)$(PREFIX)/share/icons/hicolor/$(ICON_SIZE)x$(ICON_SIZE)/apps
 
 install:
-	mkdir -pv $(icon_target)
-	cp -v $(icon_source)/system-monitor-status-icon*.png $(icon_target)
-	cp -v system-monitor-status-icon $(prefix)/bin
-
-uninstall:
-	rm -fv $(icon_target)/system-monitor-status-icon*.png
-	rm -fv $(prefix)/bin/system-monitor-status-icon
+	mkdir -p $(icon_target)
+	cp system-monitor-status-icon $(bindir)
+	cp $(icon_source)/system-monitor-status-icon*.png $(icon_target)
