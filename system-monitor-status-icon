@@ -22,7 +22,6 @@ A CPU, memory and disk usage monitor status icon.
 Requires PyGObject and psutil.
 """
 
-import collections
 import math
 import psutil
 import subprocess
@@ -46,10 +45,14 @@ class Monitor(Gtk.StatusIcon):
         self.disk_counters = psutil.disk_io_counters()
         self.disk_max = 1/1000000
 
+    def clip(self, value, valuemin, valuemax):
+        """Clip `value` to [`valuemin`, `valuemax`]."""
+        return max(valuemin, min(valuemax, value))
+
     def get_cpu_usage(self):
         """Return per-CPU usage between [0,1]."""
         usage = psutil.cpu_percent(percpu=True)
-        return [max(0, min(1, x/100)) for x in usage]
+        return [self.clip(x/100, 0, 1) for x in usage]
 
     def get_disk_usage(self):
         """Return disk usage between [0,1]."""
@@ -60,16 +63,16 @@ class Monitor(Gtk.StatusIcon):
         bytes2 = count2.read_bytes + count2.write_bytes
         diff = (bytes2 - bytes1) / 1024**2
         self.disk_max = max(self.disk_max, diff)
-        return max(0, min(1, diff/self.disk_max))
+        return self.clip(diff/self.disk_max, 0, 1)
 
     def get_memory_usage(self):
         """Return memory usage between [0,1]."""
         usage = psutil.virtual_memory().percent
-        return max(0, min(1, usage/100))
+        return self.clip(usage/100, 0, 1)
 
     def get_state(self, usage):
         """Return state [1,4] from usage fraction [0,1]."""
-        return max(1, min(4, int(math.ceil(usage*4))))
+        return self.clip(int(math.ceil(usage*4)), 1, 4)
 
     def on_activate(self, icon):
         """Launch a system monitor application for details."""
