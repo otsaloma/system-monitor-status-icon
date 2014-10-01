@@ -23,6 +23,7 @@ Requires PyGObject and psutil.
 """
 
 import math
+import os
 import psutil
 import subprocess
 import sys
@@ -78,9 +79,10 @@ class Monitor(Gtk.StatusIcon):
         """Launch a system monitor application for details."""
         try:
             if sys.platform == "win32":
-                subprocess.Popen("taskmgr")
-            else:
-                # TODO: Add KDE, XFCE etc. equivalents.
+                return subprocess.Popen("taskmgr")
+            # TODO: Add KDE, XFCE etc. equivalents.
+            desktop = os.environ.get("XDG_CURRENT_DESKTOP", "")
+            if desktop == "GNOME":
                 subprocess.Popen("gnome-system-monitor")
         except Exception:
             pass
@@ -100,7 +102,7 @@ class Monitor(Gtk.StatusIcon):
                    activate_time=time)
 
     def update(self):
-        """Poll the usage values and update icon."""
+        """Poll usage values and update icon."""
         cpu = self.get_cpu_usage()
         memory = self.get_memory_usage()
         disk = self.get_disk_usage()
@@ -120,16 +122,13 @@ class Monitor(Gtk.StatusIcon):
         """Update detailed information to tooltip."""
         # TODO: Use Gtk.Widget.set_tooltip_window
         # to get the labels and values to line up nicely.
-        markup = ""
-        for i in range(len(cpu)):
-            markup += ("<b>CPU:</b> {:.0f}%\n"
-                       .format(cpu[i]*100))
+        markup = "\n".join("<b>CPU:</b> {:.0f}%\n"
+                           .format(cpu[i]*100) for i in range(len(cpu)))
 
         markup += "<b>Mem:</b> {:.0f}%\n".format(memory*100)
         markup += "<b>Disk:</b> {:.0f}%\n".format(disk*100)
         markup = "<tt>{}</tt>".format(markup)
-        # Use no-break spaces to avoid linebreaks,
-        # which seem to act funky when using tt.
+        # Use no-break spaces to avoid linebreaks.
         markup = markup.replace(" ", "\u00a0")
         self.set_tooltip_markup(markup)
 
