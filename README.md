@@ -8,11 +8,11 @@ desktop environment, theme etc. the icons might or might not require
 modifications to their sizes and colors. Icons can be easily generated
 with the provided R script.
 
-system-monitor-status-icon requires Python [1] 3.2 or greater,
-psutil [2] 0.6.0 or greater, PyGObject [3] 3.0.0 or greater and
-GTK+ [4] 3.0.0 or greater.
+system-monitor-status-icon requires [Python][1] 3.2 or greater,
+[psutil][2] 0.6.0 or greater, [PyGObject][3] 3.0.0 or greater and
+[GTK+][4] 3.0.0 or greater.
 
- [1] http://www.python.org/
- [2] http://code.google.com/p/psutil/
- [3] http://wiki.gnome.org/Projects/PyGObject
- [4] http://www.gtk.org/
+ [1]: http://www.python.org/
+ [2]: http://code.google.com/p/psutil/
+ [3]: http://wiki.gnome.org/Projects/PyGObject
+ [4]: http://www.gtk.org/
