@@ -1,1 +1,5 @@
-To install, run `make PREFIX=... ICON_SIZE=... install`.
+To install, run
+
+```sh
+make PREFIX=... ICON_SIZE=... install
+```
