@@ -89,6 +89,7 @@ class Monitor(Gtk.StatusIcon):
 
     def on_popup_menu(self, icon, button, time):
         """Display a menu to allow quitting."""
+        # XXX: Menu doesn't appear at all in GNOME 3.
         menu = Gtk.Menu()
         item = Gtk.MenuItem(label="Quit")
         item.connect("activate", Gtk.main_quit)
@@ -122,6 +123,7 @@ class Monitor(Gtk.StatusIcon):
         """Update detailed information to tooltip."""
         # TODO: Use Gtk.Widget.set_tooltip_window
         # to get the labels and values to line up nicely.
+        # XXX: Tooltip doesn't appear at all in GNOME 3.
         markup = "\n".join("<b>CPU:</b> {:.0f}%\n"
                            .format(cpu[i]*100) for i in range(len(cpu)))
 
