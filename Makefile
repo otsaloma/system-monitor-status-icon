@@ -11,6 +11,7 @@ ICON_TARGET = $(DESTDIR)$(PREFIX)/share/icons/hicolor/$(ICON_SIZE)x$(ICON_SIZE)/
 install:
 	mkdir -p $(BINDIR)
 	cp system-monitor-status-icon $(BINDIR)
+	chmod +x $(BINDIR)/system-monitor-status-icon
 	mkdir -p $(ICON_TARGET)
 	cp $(ICON_SOURCE)/system-monitor-status-icon*.png $(ICON_TARGET)
 
