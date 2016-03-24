@@ -15,6 +15,6 @@ system-monitor-status-icon requires [Python][1] 3.2 or greater,
 [GTK+][4] 3.0.0 or greater.
 
 [1]: http://www.python.org/
-[2]: http://code.google.com/p/psutil/
+[2]: http://github.com/giampaolo/psutil
 [3]: http://wiki.gnome.org/Projects/PyGObject
 [4]: http://www.gtk.org/
