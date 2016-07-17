@@ -124,9 +124,8 @@ class Monitor(Gtk.StatusIcon):
         # TODO: Use Gtk.Widget.set_tooltip_window
         # to get the labels and values to line up nicely.
         # XXX: Tooltip doesn't appear at all in GNOME 3.
-        markup = "\n".join("<b>CPU:</b> {:.0f}%\n"
-                           .format(cpu[i]*100) for i in range(len(cpu)))
-
+        markup = "\n".join("<b>CPU:</b> {:.0f}%\n".format(
+            cpu[i]*100) for i in range(len(cpu)))
         markup += "<b>Mem:</b> {:.0f}%\n".format(memory*100)
         markup += "<b>Disk:</b> {:.0f}%\n".format(disk*100)
         markup = "<tt>{}</tt>".format(markup)
