@@ -8,9 +8,7 @@ desktop environment, theme etc. the icons might or might not require
 modifications to their sizes and colors. Icons can be easily generated
 with the provided R script.
 
-![Screenshot](http://dl.dropboxusercontent.com/u/39625783/system-monitor-status-icon-1.png)
-
-system-monitor-status-icon requires [Python][1] ≥ 3.2,
+system-monitor-status-icon requires [Python][1] ≥ 3.5,
 [psutil][2] ≥ 0.6, [PyGObject][3] ≥ 3.0 and [GTK+][4] ≥ 3.0.
 
 [1]: http://www.python.org/
