@@ -23,8 +23,8 @@ Requires PyGObject and psutil.
 """
 
 import math
-import os
 import psutil
+import shutil
 import subprocess
 import sys
 
