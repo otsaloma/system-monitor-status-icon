@@ -11,7 +11,7 @@ with the provided R script.
 system-monitor-status-icon requires [Python][1] ≥ 3.5,
 [psutil][2] ≥ 0.6, [PyGObject][3] ≥ 3.0 and [GTK+][4] ≥ 3.0.
 
-[1]: http://www.python.org/
-[2]: http://github.com/giampaolo/psutil
-[3]: http://wiki.gnome.org/Projects/PyGObject
-[4]: http://www.gtk.org/
+[1]: https://www.python.org/
+[2]: https://github.com/giampaolo/psutil
+[3]: https://wiki.gnome.org/Projects/PyGObject
+[4]: https://www.gtk.org/
