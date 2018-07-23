@@ -1,6 +1,8 @@
 system-monitor-status-icon
 ==========================
 
+![Not Maintained](https://img.shields.io/maintenance/no/2017.svg)
+
 system-monitor-status-icon is a CPU, memory and disk usage monitor
 implemented as a status icon. Depending on your desktop environment,
 this might work great or might not work at all. Also depending on your
